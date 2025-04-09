@@ -1,0 +1,26 @@
+# config.yaml
+
+data:
+  raw_data_path: data/cve111.csv
+  new_data_path: data/new_dataset.csv
+  processed_data_path: data/processed_data.csv
+
+model:
+  save_path: models/model.keras
+  tokenizer_path: models/tokenizer.pkl
+  scaler_path: models/scaler.pkl
+  max_words: 1000
+  max_len: 100
+
+training:
+  test_size: 0.2
+  validation_split: 0.2
+  batch_size: 32
+  epochs: 10
+  random_state: 42
+
+retrain:
+  accuracy_threshold: 0.95
+  mse_threshold: 0.05
+  enable_weekly_schedule: true
+  allow_manual_retrain: true
