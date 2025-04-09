@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.10' // or whatever version you trained with
+        }
+    }
     environment {
         GITHUB_REPO_URL = 'https://github.com/Sengar001/CVSS_Score_Predictor.git'
     }
