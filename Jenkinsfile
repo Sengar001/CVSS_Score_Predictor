@@ -1,9 +1,13 @@
 pipeline {
     agent any
+    environment {
+        GITHUB_REPO_URL = 'https://github.com/Sengar001/CVSS_Score_Predictor.git'
+    }
+
     stages {
-        stage('Clone Repo') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/Sengar001/CVSS_Score_Predictor.git'
+                git branch: 'main', url: "${GITHUB_REPO_URL}"
             }
         }
         stage('Install Dependencies') {
