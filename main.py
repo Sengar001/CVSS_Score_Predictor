@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from pydantic import BaseModel
 from scripts import train, evaluate, retrain
-from utils import monitor
+# from utils import monitor
 import shutil
 import os
 
