@@ -1,18 +1,20 @@
-# Dockerfile
-
-FROM python:3.10
+# Use official TensorFlow image (includes Python + TensorFlow pre-installed)
+FROM tensorflow/tensorflow:2.19.0
 
 # Set working directory
 WORKDIR /app
 
-# Copy and install dependencies
+# Copy requirements (excluding tensorflow if it's in there)
 COPY requirements.txt .
+
+# Install other dependencies (make sure tensorflow is NOT in this file)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the app
+# Copy the rest of the application
 COPY . /app
 
+# Expose the default FastAPI port
 EXPOSE 8000
 
-# Default command (can be changed in Jenkins)
+# Run the FastAPI app (adjust if you're using uvicorn or another entrypoint)
 CMD ["python3", "main.py"]
