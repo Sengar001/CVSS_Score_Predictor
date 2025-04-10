@@ -27,3 +27,6 @@ def evaluate_model():
     loss, mae = model.evaluate(X, y)
     
     print(f"[RESULT] Loss: {loss}, MAE: {mae}")
+
+if __name__ == "__main__":
+    evaluate_model()
