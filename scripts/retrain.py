@@ -5,8 +5,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import EarlyStopping
 
-from preprocess import preprocess_data
-from train import build_model
+from scripts.preprocess import preprocess_data
+from scripts.train import build_model
 
 def retrain(new_data_path):
     df = pd.read_csv(new_data_path)

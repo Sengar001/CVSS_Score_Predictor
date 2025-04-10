@@ -11,7 +11,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Embedding, LSTM, Dense, Dropout, Concatenate
 from tensorflow.keras.callbacks import EarlyStopping
 
-from preprocess import preprocess_data
+from scripts.preprocess import preprocess_data
 
 def build_model(text_input_shape, struct_input_shape):
     # Text input branch
