@@ -1,43 +1,43 @@
-import argparse
-import os
+from fastapi import FastAPI, UploadFile, File, Form
+from pydantic import BaseModel
 from scripts import train, evaluate, retrain
 from utils import monitor
+import shutil
+import os
 
+app = FastAPI()
 
-def main():
-    parser = argparse.ArgumentParser(description="CVSS Score Prediction Pipeline")
-    parser.add_argument("--action", type=str, required=True, help="train | retrain | evaluate | monitor")
-    parser.add_argument("--data", type=str, help="Path to dataset (CSV file)")
-    parser.add_argument("--threshold", type=float, default=0.95, help="Accuracy threshold for retraining")
+DATA_DIR = "data"
+os.makedirs(DATA_DIR, exist_ok=True)
 
-    args = parser.parse_args()
+class MonitorInput(BaseModel):
+    threshold: float
 
-    if args.action == "train":
-        if args.data:
-            train.train_model(args.data)
-        else:
-            print("Please provide dataset path using --data")
+@app.post("/train/")
+async def trigger_train(file: UploadFile = File(...)):
+    file_path = os.path.join(DATA_DIR, file.filename)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    train.train_model(file_path)
+    return {"message": "Model trained successfully"}
 
-    elif args.action == "evaluate":
-        evaluate.evaluate_model()
+@app.post("/retrain/")
+async def trigger_retrain(file: UploadFile = File(...)):
+    file_path = os.path.join(DATA_DIR, file.filename)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    retrain.retrain_model(file_path)
+    return {"message": "Model retrained successfully"}
 
-    elif args.action == "retrain":
-        if args.data:
-            retrain.retrain_model(args.data)
-        else:
-            print("Please provide new dataset path using --data")
+@app.get("/evaluate/")
+async def trigger_evaluation():
+    evaluate.evaluate_model()
+    return {"message": "Model evaluated successfully"}
 
-    elif args.action == "monitor":
-        should_retrain = monitor.check_accuracy_threshold(args.threshold)
-        if should_retrain:
-            print("Accuracy below threshold. Triggering retrain...")
-            retrain.retrain_model("data/new_data.csv")
-        else:
-            print("Accuracy above threshold. No need to retrain.")
-
-    else:
-        print("Invalid action. Use train | retrain | evaluate | monitor")
-
-
-if __name__ == "__main__":
-    main()
+@app.post("/monitor/")
+async def monitor_accuracy(input: MonitorInput):
+    should_retrain = monitor.check_accuracy_threshold(input.threshold)
+    if should_retrain:
+        retrain.retrain_model(os.path.join(DATA_DIR, "new_data.csv"))
+        return {"message": "Accuracy below threshold. Model retrained."}
+    return {"message": "Accuracy above threshold. No retraining needed."}

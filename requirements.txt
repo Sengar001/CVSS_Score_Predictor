@@ -3,3 +3,8 @@ numpy
 scikit-learn
 pyyaml
 joblib
+fastapi
+uvicorn
+pydantic
+python-multipart  
+
