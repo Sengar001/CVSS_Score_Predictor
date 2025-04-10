@@ -34,10 +34,10 @@ async def trigger_evaluation():
     evaluate.evaluate_model()
     return {"message": "Model evaluated successfully"}
 
-@app.post("/monitor/")
-async def monitor_accuracy(input: MonitorInput):
-    should_retrain = monitor.check_accuracy_threshold(input.threshold)
-    if should_retrain:
-        retrain.retrain_model(os.path.join(DATA_DIR, "new_data.csv"))
-        return {"message": "Accuracy below threshold. Model retrained."}
-    return {"message": "Accuracy above threshold. No retraining needed."}
+# @app.post("/monitor/")
+# async def monitor_accuracy(input: MonitorInput):
+#     should_retrain = monitor.check_accuracy_threshold(input.threshold)
+#     if should_retrain:
+#         retrain.retrain_model(os.path.join(DATA_DIR, "new_data.csv"))
+#         return {"message": "Accuracy below threshold. Model retrained."}
+#     return {"message": "Accuracy above threshold. No retraining needed."}
