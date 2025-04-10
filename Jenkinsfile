@@ -22,27 +22,32 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-        steps {
-            withCredentials([usernamePassword(credentialsId: 'DockerHubCred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                script {
-                    def loginStatus = sh(script: 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin', returnStatus: true)
-                    if (loginStatus != 0) {
-                        error("Docker login failed. Check credentials and try again.")
-                    }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'DockerHubCred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    script {
+                        def loginStatus = sh(script: 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin', returnStatus: true)
+                        if (loginStatus != 0) {
+                            error("Docker login failed. Check credentials and try again.")
+                        }
 
-                    def pushStatus = sh(script: 'docker push $DOCKER_IMAGE', returnStatus: true)
-                    if (pushStatus != 0) {
-                        error("Docker image push failed. Check DockerHub repository permissions.")
+                        def pushStatus = sh(script: 'docker push $DOCKER_IMAGE', returnStatus: true)
+                        if (pushStatus != 0) {
+                            error("Docker image push failed. Check DockerHub repository permissions.")
+                        }
                     }
                 }
             }
         }
-    }
 
-        // stage('Deploy Container') {
-        //     steps {
-        //         sh "docker run -d -p 8000:8000 --name cvss-app ${DOCKER_IMAGE}:latest"
-        //     }
-        // }
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig-secret', variable: 'KUBECONFIG_FILE')]) {
+                    sh '''
+                        export KUBECONFIG=$KUBECONFIG_FILE
+                        kubectl apply -f k8s/
+                    '''
+                }
+            }
+        }
     }
 }
